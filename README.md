@@ -1,5 +1,5 @@
 # WatCard Android API
-[ ![Download](https://api.bintray.com/packages/jeffreyca/maven/watcard-java-api/images/download.svg) ](https://bintray.com/jeffreyca/maven/watcard-java-api/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/jeffreyca/maven/watcard-android/images/download.svg) ](https://bintray.com/jeffreyca/maven/watcard-android/_latestVersion)
 
 An Android-compatible Java library for retrieving UWaterloo WatCard data from the web (https://watcard.uwaterloo.ca).
 
