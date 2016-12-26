@@ -69,7 +69,7 @@ public class WatTransaction implements Serializable {
             return "Meal Plan";
         }
     }
-    
+
     public boolean isFlex() {
         return flex;
     }
