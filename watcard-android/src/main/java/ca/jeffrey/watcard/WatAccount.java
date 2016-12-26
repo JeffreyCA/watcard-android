@@ -44,6 +44,7 @@ public class WatAccount {
     private String phone;
     private String mobile;
     private String address;
+    private String photo;
 
     /**
      * Constructor
@@ -58,7 +59,7 @@ public class WatAccount {
         this.password = password.toCharArray();
         balances = new ArrayList<>();
         total = 0;
-        name = birthDate = maritalStatus = sex = email = phone = mobile = address = "";
+        name = birthDate = maritalStatus = sex = email = phone = mobile = address = photo = "";
     }
 
     /**
@@ -73,7 +74,7 @@ public class WatAccount {
         this.password = password.toCharArray();
         balances = new ArrayList<>();
         total = 0;
-        name = birthDate = maritalStatus = sex = email = phone = mobile = address = "";
+        name = birthDate = maritalStatus = sex = email = phone = mobile = address = photo = "";
     }
 
     /**
@@ -137,11 +138,11 @@ public class WatAccount {
      * Retrieves user's account information stores it in {@code WatAccount} fields.
      */
     public void loadPersonalInfo() {
-        // Request URL
-        final String BALANCE_URL = "https://watcard.uwaterloo.ca/OneWeb/Account/Personal";
+        final String BASE_URL = "https://watcard.uwaterloo.ca";
+        final String PERSONAL_URL = BASE_URL + "/OneWeb/Account/Personal";
 
         try {
-            URL url = new URL(BALANCE_URL);
+            URL url = new URL(PERSONAL_URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             connection.setReadTimeout(10000);
@@ -174,6 +175,13 @@ public class WatAccount {
             phone = info.get(6).text().replaceAll("[-().\\s]", ""); // Remove all formatting
             mobile = info.get(7).text().replaceAll("[-().\\s]", "");
             address = info.get(8).text();
+
+            // Get photo URL
+            Element jpg = doc.select(".ow-id-container.hidden-xs").first().select("[data-original]").first();
+            photo = BASE_URL + jpg.attr("data-original");
+
+            if (photo.equals(BASE_URL))
+                photo = "";
         }
         catch (IOException ie) {
             ie.printStackTrace();
@@ -635,5 +643,13 @@ public class WatAccount {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 }
