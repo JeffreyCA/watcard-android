@@ -1,5 +1,7 @@
+def ver = '1.0'
+
 group = 'ca.jeffrey.watcard'
-version = '0.3'
+version = ver
 
 targetCompatibility = '1.7'
 sourceCompatibility = '1.7'
@@ -31,7 +33,7 @@ publishing {
             artifact javadocJar
             groupId 'ca.jeffrey.watcard'
             artifactId 'watcard-android'
-            version '0.3'
+            version ver
             pom.withXml {
                 def root = asNode()
                 root.appendNode('description', 'An Android-compatible Java library for retrieving UWaterloo WatCard data')
@@ -62,9 +64,9 @@ bintray {
         publish = true
 
         version {
-			name = '0.3'
-			desc = 'Bintray Release'
-			vcsTag = '0.3'
+			name = ver
+			desc = 'Stable Release'
+			vcsTag = ver
         }
     }
 }
