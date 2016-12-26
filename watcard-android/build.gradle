@@ -64,9 +64,9 @@ bintray {
         publish = true
 
         version {
-			name = ver
-			desc = 'Stable Release'
-			vcsTag = ver
+            name = ver
+            desc = 'Stable Release'
+            vcsTag = ver
         }
     }
 }
