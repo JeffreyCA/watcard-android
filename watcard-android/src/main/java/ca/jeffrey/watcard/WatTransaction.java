@@ -41,7 +41,7 @@ public class WatTransaction implements Serializable {
         this.unit = unit;
         this.type = type;
         this.terminal = terminal;
-        flex = terminal.contains("WAT-FS");
+        flex = !terminal.contains("WAT-FS"); // Flex transaction?
     }
 
     @Override
@@ -55,12 +55,27 @@ public class WatTransaction implements Serializable {
         return dateTime;
     }
 
+    // Formatted time
+    public String getTimeString() {
+        DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("dd MMM 'at' h:mm a");
+        return myFormat.format(dateTime);
+    }
+
+    public boolean isFlex() {
+        return flex;
+    }
+
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
     }
 
     public float getAmount() {
         return amount;
+    }
+
+    // Formatted amount
+    public String getAmountString() {
+        return NumberFormat.getCurrencyInstance(Locale.CANADA).format(amount);
     }
 
     public void setAmount(float amount) {
@@ -87,17 +102,6 @@ public class WatTransaction implements Serializable {
         return type;
     }
 
-    public String getTypeString() {
-        switch (unit) {
-            case 0: {
-                return "Meal Plan";
-            }
-            default: {
-                return "Flex Dollars";
-            }
-        }
-    }
-
     public void setType(String type) {
         this.type = type;
     }
@@ -113,18 +117,4 @@ public class WatTransaction implements Serializable {
     public void setTerminal(String terminal) {
         this.terminal = terminal;
     }
-
-    public String getAmountString() {
-        return NumberFormat.getCurrencyInstance(Locale.CANADA).format(amount);
-    }
-
-    public String getTimeString() {
-        DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("dd MMM 'at' h:mm a");
-        return myFormat.format(dateTime);
-    }
-
-    public boolean isFlex() {
-        return flex;
-    }
 }
-

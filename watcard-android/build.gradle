@@ -1,5 +1,47 @@
 group = 'ca.jeffrey.watcard'
-version = '0.2'
+version = '0.3'
+
+targetCompatibility = '1.7'
+sourceCompatibility = '1.7'
+
+// Create the pom configuration:
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "jeffreyca"
+            name "Jeffrey"
+            email "jeffreyca16@gmail.com"
+        }
+    }
+}
+
+// Create the publication with the pom configuration:
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            groupId 'ca.jeffrey.watcard'
+            artifactId 'watcard-android'
+            version '0.3'
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'An Android-compatible Java library for retrieving UWaterloo WatCard data')
+                root.appendNode('name', 'watcard-android')
+                root.appendNode('url', 'https://github.com/JeffreyCA/watcard-android')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
 
 Properties properties = new Properties()
 File propFile = "${System.properties['user.home']}${File.separator}.gradle${File.separator}bintray.properties" as File
@@ -8,7 +50,7 @@ properties.load(propFile.newDataInputStream())
 bintray {
     user = properties.getProperty("bintray.user")
     key = properties.getProperty("bintray.apikey")
-    configurations = ['archives']
+    publications = ['MyPublication']
 
     pkg {
         repo = 'maven'
@@ -20,15 +62,14 @@ bintray {
         publish = true
 
         version {
-			name = '0.2'
+			name = '0.3'
 			desc = 'Bintray Release'
-			vcsTag = '0.2'
+			vcsTag = '0.3'
         }
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.jakewharton.threetenabp:threetenabp:1.0.4'
     compile 'org.jsoup:jsoup:1.10.1'
 }

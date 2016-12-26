@@ -112,6 +112,7 @@ public class WatAccount {
             connection.setDoInput(true);
             connection.setDoOutput(true);
 
+            // Construct request parameters
             StringBuilder postData = new StringBuilder();
             for (Map.Entry<String, String> param : params.entrySet()) {
                 if (postData.length() != 0)
@@ -124,7 +125,6 @@ public class WatAccount {
 
             byte[] postDataBytes = postData.toString().getBytes("UTF-8");
             connection.getOutputStream().write(postDataBytes);
-            // connection.connect();
             code = connection.getResponseCode();
         }
         catch (IOException ie) {
@@ -351,8 +351,8 @@ public class WatAccount {
      * Returns amount of meal plan funds. If {@code balances} was not properly loaded, it returns 0.
      * @return amount of funds in meal plan
      */
-    public double getMealBalance() {
-        double balance = 0;
+    public float getMealBalance() {
+        float balance = 0;
 
         if (balances.size() == BALANCE_TYPES) {
             balance = getWatBalance(WatBalanceType.VILLAGE_MEAL).getValue() +
@@ -366,8 +366,8 @@ public class WatAccount {
      * Returns amount of other funds. If {@code balances} was not properly loaded, it returns 0.
      * @return amount of other funds
      */
-    public double getOtherBalance() {
-        double balance = 0;
+    public float getOtherBalance() {
+        float balance = 0;
 
         if (balances.size() == BALANCE_TYPES) {
             balance = getWatBalance(WatBalanceType.TRANSFER).getValue() +
@@ -565,7 +565,7 @@ public class WatAccount {
         this.balances = balances;
     }
 
-    public double getTotalBalance() {
+    public float getTotalBalance() {
         return total;
     }
 
