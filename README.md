@@ -19,7 +19,7 @@ dependencies {
 ## [Usage](https://github.com/JeffreyCA/watcard-java-api#usage)
 
 ## Other Resources
-Read the javadoc [here](https://jeffreyca.github.io/watcard-java-api/).
+Read the javadoc [here](https://jeffreyca.github.io/watcard-android/).
 
 ## Contributing
 Improvements and changes are welcome!
