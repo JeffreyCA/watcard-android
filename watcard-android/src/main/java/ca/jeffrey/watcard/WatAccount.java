@@ -88,20 +88,17 @@ public class WatAccount {
      * Logs user into WatCard site by initiating a POST request containing a {@code __RequestVerificationToken} and user
      * account details. Uses a {@code WatSession} to store cookies and verification token.
      *
-     * @return Response of POST request, or -1 if there was an IOException
+     * @return true if login is successful, otherwise it throws an exception.
      */
-    public int login() {
+    public boolean login() {
         // Request URL
         final String LOGIN_URL = "https://watcard.uwaterloo.ca/OneWeb/Account/LogOn";
-        // Default code
-        int code = -1;
 
         Map<String, String> params = new LinkedHashMap<>();
         params.put("__RequestVerificationToken", session.getVerificationToken());
         params.put("AccountMode", "0"); // default value
         params.put("Account", account);
         params.put("Password", new String(password));
-
 
         try {
             URL url = new URL(LOGIN_URL);
@@ -126,12 +123,19 @@ public class WatAccount {
 
             byte[] postDataBytes = postData.toString().getBytes("UTF-8");
             connection.getOutputStream().write(postDataBytes);
-            code = connection.getResponseCode();
+
+            InputStream inputStream = connection.getInputStream();
+            if (connection.getURL().toString().equals(LOGIN_URL)) {
+                // Invalid login information
+                throw new IllegalArgumentException("Authentication error.");
+            }
+
+            inputStream.close();
         }
         catch (IOException ie) {
             ie.printStackTrace();
         }
-        return code;
+        return true;
     }
 
     /**
@@ -182,6 +186,8 @@ public class WatAccount {
 
             if (photo.equals(BASE_URL))
                 photo = "";
+
+            inputStream.close();
         }
         catch (IOException ie) {
             ie.printStackTrace();
@@ -247,6 +253,8 @@ public class WatAccount {
 
             String totalString = doc.select("span.pull-right").text().replace("Total: $", "");
             total = Float.valueOf(totalString);
+
+            inputStream.close();
         }
         catch (IOException ie) {
             ie.printStackTrace();
@@ -443,6 +451,8 @@ public class WatAccount {
                     transactions.add(new WatTransaction(dateTime, amount, account, unit, type, terminal));
                 }
             }
+
+            inputStream.close();
         }
         catch (IOException ie) {
             ie.printStackTrace();
