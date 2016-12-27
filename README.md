@@ -6,7 +6,7 @@ An Android-compatible Java library for retrieving UWaterloo WatCard data from th
 ## Setup
 Simply include the following to your `build.gradle` file:
 
-```
+```Gradle
 repositories {
     jCenter()
 }
@@ -16,8 +16,10 @@ dependencies {
 }
 ```
 
-## Usage
+## [Usage](https://github.com/JeffreyCA/watcard-java-api#usage)
 
-Read the javadoc [here](https://jeffreyca.github.io/watcard-java-api/).
+## Other Resources
+Read the javadoc [here](https://jeffreyca.github.io/watcard-android/).
 
-Examples will be posted here soon.
+## Contributing
+Improvements and changes are welcome!
