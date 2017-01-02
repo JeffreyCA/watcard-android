@@ -107,7 +107,6 @@ public class WatAccount {
             connection.setReadTimeout(10000);
             connection.setConnectTimeout(15000);
             connection.setRequestMethod("POST");
-            connection.setDoInput(true);
             connection.setDoOutput(true);
 
             // Construct request parameters
@@ -124,13 +123,12 @@ public class WatAccount {
             byte[] postDataBytes = postData.toString().getBytes("UTF-8");
             connection.getOutputStream().write(postDataBytes);
 
-            InputStream inputStream = connection.getInputStream();
+            connection.getInputStream();
+
             if (connection.getURL().toString().equals(LOGIN_URL)) {
                 // Invalid login information
                 throw new IllegalArgumentException("Authentication error.");
             }
-
-            inputStream.close();
         }
         catch (IOException ie) {
             ie.printStackTrace();
@@ -245,13 +243,13 @@ public class WatAccount {
                 String id = info.get(0).text();
                 String name = info.get(1).text();
                 // Remove $ character
-                float limit = Float.parseFloat(info.get(2).text().replace("$", ""));
-                float value = Float.parseFloat(info.get(3).text().replace("$", ""));
+                float limit = Float.parseFloat(info.get(2).text().replaceAll("[$,]", ""));
+                float value = Float.parseFloat(info.get(3).text().replaceAll("[$,]", ""));
                 // Add WatBalance to list
                 balances.add(new WatBalance(id, name, limit, value));
             }
 
-            String totalString = doc.select("span.pull-right").text().replace("Total: $", "");
+            String totalString = doc.select("span.pull-right").text().replaceAll("[[A-Z][a-z]$,:]", "");
             total = Float.valueOf(totalString);
 
             inputStream.close();

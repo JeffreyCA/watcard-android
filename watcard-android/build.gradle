@@ -1,4 +1,4 @@
-def ver = '1.5'
+def ver = '1.7'
 
 group = 'ca.jeffrey.watcard'
 version = ver
