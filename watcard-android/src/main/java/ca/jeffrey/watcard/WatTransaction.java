@@ -18,11 +18,11 @@ public class WatTransaction implements Serializable {
     // Fields
     private LocalDateTime dateTime;
     private float amount;
-    private String account;
+    private int account;
+    private WatBalanceType balanceType;
     private int unit;
     private String type;
     private String terminal;
-    private boolean flex;
 
     /**
      * Constructor
@@ -34,14 +34,49 @@ public class WatTransaction implements Serializable {
      * @param type type of transaction
      * @param terminal location of transaction
      */
-    public WatTransaction(LocalDateTime dateTime, float amount, String account, int unit, String type, String terminal) {
+    public WatTransaction(LocalDateTime dateTime, float amount, int account, int unit, String type, String terminal) {
         this.dateTime = dateTime;
         this.amount = amount;
         this.account = account;
         this.unit = unit;
         this.type = type;
         this.terminal = terminal;
-        flex = !terminal.contains("WAT-FS"); // Flex transaction?
+        balanceType = determineBalanceType();
+    }
+
+    /**
+     * Determines from what balance account funds were deducted from
+     * @return WatBalanceType enum
+     */
+    private WatBalanceType determineBalanceType() {
+        switch (account) {
+            case 1:
+                return WatBalanceType.VILLAGE_MEAL;
+            case 2:
+                return WatBalanceType.BEST_BUY_MEAL;
+            case 3:
+                return WatBalanceType.FOOD_PLAN;
+            case 4:
+                return WatBalanceType.FLEX1;
+            case 5:
+                return WatBalanceType.FLEX2;
+            case 6:
+                return WatBalanceType.FLEX3;
+            case 7:
+                return WatBalanceType.TRANSFER;
+            case 8:
+                return WatBalanceType.DON_MEAL;
+            case 9:
+                return WatBalanceType.DON_FLEX;
+            case 10:
+                return WatBalanceType.REWARDS;
+            case 11:
+                return WatBalanceType.DEPT_CHARGE;
+            case 12:
+                return WatBalanceType.OVERDRAFT;
+            default:
+                return WatBalanceType.OTHER;
+        }
     }
 
     @Override
@@ -62,16 +97,27 @@ public class WatTransaction implements Serializable {
     }
 
     public String getAccountTypeString() {
-        if (flex) {
+        if (isFlex()) {
             return "Flex Dollars";
         }
-        else {
+        else if (isMeal()) {
             return "Meal Plan";
+        }
+        else {
+            return "Other";
         }
     }
 
-    public boolean isFlex() {
-        return flex;
+    private boolean isFlex() {
+        return balanceType == WatBalanceType.FLEX1 || balanceType == WatBalanceType.FLEX2
+                || balanceType == WatBalanceType.FLEX3;
+    }
+
+    private boolean isMeal() {
+        return balanceType == WatBalanceType.VILLAGE_MEAL
+                || balanceType == WatBalanceType.BEST_BUY_MEAL
+                || balanceType == WatBalanceType.FOOD_PLAN
+                || balanceType == WatBalanceType.DON_MEAL;
     }
 
     public void setDateTime(LocalDateTime dateTime) {
@@ -91,11 +137,11 @@ public class WatTransaction implements Serializable {
         this.amount = amount;
     }
 
-    public String getAccount() {
+    public int getAccount() {
         return account;
     }
 
-    public void setAccount(String account) {
+    public void setAccount(int account) {
         this.account = account;
     }
 

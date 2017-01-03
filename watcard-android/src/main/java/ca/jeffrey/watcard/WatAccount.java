@@ -440,8 +440,8 @@ public class WatAccount {
                     Elements data = transaction.select("td");
                     // Store selected data in corresponding fields
                     LocalDateTime dateTime = LocalDateTime.parse(data.get(0).text(), RESPONSE_FORMAT);
-                    float amount = Float.valueOf(data.get(1).text().replaceAll("[$,]", ""));
-                    String account = data.get(2).text();
+                    float amount = Float.parseFloat(data.get(1).text().replaceAll("[$,]", ""));
+                    int account = Integer.parseInt(data.get(2).text());
                     int unit = Integer.valueOf(data.get(3).text());
                     String type = data.get(4).text();
                     String terminal = data.get(5).text();
