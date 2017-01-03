@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    compile 'ca.jeffrey.watcard:watcard-android:1.8'
+    compile 'ca.jeffrey.watcard:watcard-android:2.0'
 }
 ```
 
