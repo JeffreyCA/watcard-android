@@ -20,6 +20,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -467,7 +468,7 @@ public class WatAccount {
     public List<WatTransaction> getTransactions(LocalDateTime begin) {
         String formattedBegin = WatTransaction.DATE_FORMAT.format(begin);
         String formattedToday = WatTransaction.DATE_FORMAT.format(LocalDateTime.now());
-        String url = WatTransaction.BASE_URL + String.format("?dateFrom=%s&dateTo=%s&returnRows=0",
+        String url = WatTransaction.BASE_URL + String.format(Locale.CANADA, "?dateFrom=%s&dateTo=%s&returnRows=0",
                 formattedBegin, formattedToday); // returnRows = 0 returns all transactions within those dates
 
         return getTransactions(url);
@@ -484,7 +485,7 @@ public class WatAccount {
     public List<WatTransaction> getTransactions(LocalDateTime begin, int quantity) {
         String formattedBegin = WatTransaction.DATE_FORMAT.format(begin);
         String formattedToday = WatTransaction.DATE_FORMAT.format(LocalDateTime.now());
-        String url = WatTransaction.BASE_URL + String.format("?dateFrom=%s&dateTo=%s&returnRows=%d",
+        String url = WatTransaction.BASE_URL + String.format(Locale.CANADA, "?dateFrom=%s&dateTo=%s&returnRows=%d",
                 formattedBegin, formattedToday, quantity);
 
         return getTransactions(url);
@@ -500,7 +501,7 @@ public class WatAccount {
     public List<WatTransaction> getTransactions(LocalDateTime begin, LocalDateTime end) {
         String formattedBegin = WatTransaction.DATE_FORMAT.format(begin);
         String formattedEnd = WatTransaction.DATE_FORMAT.format(end);
-        String url = WatTransaction.BASE_URL + String.format("?dateFrom=%s&dateTo=%s&returnRows=0",
+        String url = WatTransaction.BASE_URL + String.format(Locale.CANADA, "?dateFrom=%s&dateTo=%s&returnRows=0",
                 formattedBegin, formattedEnd);
 
         return getTransactions(url);
@@ -518,7 +519,7 @@ public class WatAccount {
     public List<WatTransaction> getTransactions(LocalDateTime begin, LocalDateTime end, int quantity) {
         String formattedBegin = WatTransaction.DATE_FORMAT.format(begin);
         String formattedEnd = WatTransaction.DATE_FORMAT.format(end);
-        String url = WatTransaction.BASE_URL + String.format("?dateFrom=%s&dateTo=%s&returnRows=%d",
+        String url = WatTransaction.BASE_URL + String.format(Locale.CANADA, "?dateFrom=%s&dateTo=%s&returnRows=%d",
                 formattedBegin, formattedEnd, quantity);
 
         return getTransactions(url);
@@ -546,7 +547,7 @@ public class WatAccount {
             formattedEnd = WatTransaction.DATE_FORMAT.format(LocalDateTime.now());
         }
 
-        String url = WatTransaction.BASE_URL + String.format("?dateFrom=%s&dateTo=%s&returnRows=0",
+        String url = WatTransaction.BASE_URL + String.format(Locale.CANADA, "?dateFrom=%s&dateTo=%s&returnRows=0",
                 formattedBegin, formattedEnd);
 
         return getTransactions(url);

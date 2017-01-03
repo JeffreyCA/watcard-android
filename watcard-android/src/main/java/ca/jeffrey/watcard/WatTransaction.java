@@ -96,6 +96,18 @@ public class WatTransaction implements Serializable {
         return myFormat.format(dateTime);
     }
 
+    public boolean isFlex() {
+        return balanceType == WatBalanceType.FLEX1 || balanceType == WatBalanceType.FLEX2
+                || balanceType == WatBalanceType.FLEX3;
+    }
+
+    public boolean isMeal() {
+        return balanceType == WatBalanceType.VILLAGE_MEAL
+                || balanceType == WatBalanceType.BEST_BUY_MEAL
+                || balanceType == WatBalanceType.FOOD_PLAN
+                || balanceType == WatBalanceType.DON_MEAL;
+    }
+
     public String getAccountTypeString() {
         if (isFlex()) {
             return "Flex Dollars";
@@ -108,18 +120,6 @@ public class WatTransaction implements Serializable {
         }
     }
 
-    private boolean isFlex() {
-        return balanceType == WatBalanceType.FLEX1 || balanceType == WatBalanceType.FLEX2
-                || balanceType == WatBalanceType.FLEX3;
-    }
-
-    private boolean isMeal() {
-        return balanceType == WatBalanceType.VILLAGE_MEAL
-                || balanceType == WatBalanceType.BEST_BUY_MEAL
-                || balanceType == WatBalanceType.FOOD_PLAN
-                || balanceType == WatBalanceType.DON_MEAL;
-    }
-
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
     }
@@ -128,7 +128,6 @@ public class WatTransaction implements Serializable {
         return amount;
     }
 
-    // Formatted amount
     public String getAmountString() {
         return NumberFormat.getCurrencyInstance(Locale.CANADA).format(amount);
     }
