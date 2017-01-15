@@ -7,5 +7,4 @@ Changes:
 - Refine how a `WatTransaction` is categorized
     - `account` field is regarded as `int` instead of `String`
     - New `balanceType` stores the `WatBalanceType` of the transaction (the balance account from/to which funds were taken/added)
-- Add additional `WatBalanceType` value: `OTHER` for preventative measures
-quired ruby and rubygems versions (@segiddins)
+- Add additional `WatBalanceType` for preventative measures
