@@ -8,20 +8,18 @@ import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 import org.threeten.bp.temporal.ChronoUnit;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+
+import okhttp3.FormBody;
+import okhttp3.JavaNetCookieJar;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 
 public class WatAccount {
@@ -83,6 +81,7 @@ public class WatAccount {
      */
     public void newSession() {
         session = new WatSession();
+        login();
     }
 
     /**
@@ -91,50 +90,44 @@ public class WatAccount {
      *
      * @return true if login is successful, otherwise it throws an exception.
      */
-    public boolean login() {
+    public int login() {
         // Request URL
         final String LOGIN_URL = "https://watcard.uwaterloo.ca/OneWeb/Account/LogOn";
 
-        Map<String, String> params = new LinkedHashMap<>();
-        params.put("__RequestVerificationToken", session.getVerificationToken());
-        params.put("AccountMode", "0"); // default value
-        params.put("Account", account);
-        params.put("Password", new String(password));
+        // Build parameters
+        FormBody.Builder formBuilder = new FormBody.Builder();
+        formBuilder.add("__RequestVerificationToken", session.getVerificationToken());
+        formBuilder.add("AccountMode", "0"); // default value
+        formBuilder.add("Account", account);
+        formBuilder.add("Password", new String(password));
+
+        RequestBody formBody = formBuilder.build();
+        Request request = new Request.Builder()
+                .url(LOGIN_URL)
+                .post(formBody)
+                .build();
+
+        CookieManager cookieManager = session.getCookieManager();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cookieJar(new JavaNetCookieJar(cookieManager))
+                .build();
 
         try {
-            URL url = new URL(LOGIN_URL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            connection.setReadTimeout(10000);
-            connection.setConnectTimeout(15000);
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-
-            // Construct request parameters
-            StringBuilder postData = new StringBuilder();
-            for (Map.Entry<String, String> param : params.entrySet()) {
-                if (postData.length() != 0)
-                    postData.append('&');
-
-                postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
-                postData.append('=');
-                postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+            Response response = client.newCall(request).execute();
+            if (!response.isSuccessful()) {
+                return response.code();
             }
-
-            byte[] postDataBytes = postData.toString().getBytes("UTF-8");
-            connection.getOutputStream().write(postDataBytes);
-
-            connection.getInputStream();
-
-            if (connection.getURL().toString().equals(LOGIN_URL)) {
-                // Invalid login information
-                throw new IllegalArgumentException("Authentication error.");
+            if (response.networkResponse().request().url().toString().equals(LOGIN_URL)) {
+                return -1;
+            }
+            else {
+                return response.code();
             }
         }
         catch (IOException ie) {
             ie.printStackTrace();
+            return -1;
         }
-        return true;
     }
 
     /**
@@ -144,26 +137,15 @@ public class WatAccount {
         final String BASE_URL = "https://watcard.uwaterloo.ca";
         final String PERSONAL_URL = BASE_URL + "/OneWeb/Account/Personal";
 
+        CookieManager cookieManager = session.getCookieManager();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cookieJar(new JavaNetCookieJar(cookieManager))
+                .build();
+
         try {
-            URL url = new URL(PERSONAL_URL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            connection.setReadTimeout(10000);
-            connection.setConnectTimeout(15000);
-            connection.setRequestMethod("GET");
-
-            connection.getContent();
-
-            InputStream inputStream = connection.getInputStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(inputStream));
-            String line = "";
-            StringBuffer buffer = new StringBuffer("");
-
-            while ((line = rd.readLine()) != null) {
-                buffer.append(line);
-            }
-
-            String htmlResponse = buffer.toString();
+            Request request = new Request.Builder().url(PERSONAL_URL).build();
+            Response response = client.newCall(request).execute();
+            String htmlResponse = response.body().string();
 
             Document doc = Jsoup.parse(htmlResponse);
             Elements info = doc.getElementsByClass("ow-info-container").first()
@@ -185,8 +167,6 @@ public class WatAccount {
 
             if (photo.equals(BASE_URL))
                 photo = "";
-
-            inputStream.close();
         }
         catch (IOException ie) {
             ie.printStackTrace();
@@ -211,28 +191,15 @@ public class WatAccount {
         balances = new ArrayList<>();
 
         CookieManager cookieManager = session.getCookieManager();
-        CookieHandler.setDefault(cookieManager);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cookieJar(new JavaNetCookieJar(cookieManager))
+                .build();
 
         try {
-            URL url = new URL(BALANCE_URL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            Request request = new Request.Builder().url(BALANCE_URL).build();
+            Response response = client.newCall(request).execute();
+            String htmlResponse = response.body().string();
 
-            connection.setReadTimeout(10000);
-            connection.setConnectTimeout(15000);
-            connection.setRequestMethod("GET");
-
-            connection.getContent();
-
-            InputStream inputStream = connection.getInputStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(inputStream));
-            String line = "";
-            StringBuffer buffer = new StringBuffer("");
-
-            while ((line = rd.readLine()) != null) {
-                buffer.append(line + "\n");
-            }
-
-            String htmlResponse = buffer.toString();
             Document doc = Jsoup.parse(htmlResponse);
             // Select rows in the balance table
             Elements accounts = doc.getElementsByClass("table table-striped ow-table-responsive").first()
@@ -252,8 +219,6 @@ public class WatAccount {
 
             String totalString = doc.select("span.pull-right").text().replaceAll("[[A-Z][a-z]$,:]", "");
             total = Float.valueOf(totalString);
-
-            inputStream.close();
         }
         catch (IOException ie) {
             ie.printStackTrace();
@@ -409,26 +374,15 @@ public class WatAccount {
         // Initialize list
         List<WatTransaction> transactions = new ArrayList<>();
 
+        CookieManager cookieManager = session.getCookieManager();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cookieJar(new JavaNetCookieJar(cookieManager))
+                .build();
+
         try {
-            URL url_ = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) url_.openConnection();
-
-            connection.setReadTimeout(10000);
-            connection.setConnectTimeout(15000);
-            connection.setRequestMethod("GET");
-
-            connection.getContent();
-
-            InputStream inputStream = connection.getInputStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(inputStream));
-            String line = "";
-            StringBuffer buffer = new StringBuffer("");
-
-            while ((line = rd.readLine()) != null) {
-                buffer.append(line);
-            }
-
-            String htmlResponse = buffer.toString();
+            Request request = new Request.Builder().url(url).build();
+            Response response = client.newCall(request).execute();
+            String htmlResponse = response.body().string();
 
             if (!htmlResponse.contains("No transactions found!")) {
                 Document doc = Jsoup.parse(htmlResponse);
@@ -450,8 +404,6 @@ public class WatAccount {
                     transactions.add(new WatTransaction(dateTime, amount, account, unit, type, terminal));
                 }
             }
-
-            inputStream.close();
         }
         catch (IOException ie) {
             ie.printStackTrace();
