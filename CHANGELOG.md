@@ -1,3 +1,8 @@
+## v2.3
+
+- Update dependency libraries
+- Republish library on JCenter
+
 ## v2.1
 
 - `HTTPSUrlConnection` was causing problems with managing cookies, so I decided to move to the `OkHttp3` library.
